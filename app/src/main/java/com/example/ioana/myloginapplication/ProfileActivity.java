@@ -18,9 +18,6 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         final SharedPreferences myPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        Intent loginIntent = getIntent();
-        String pass = loginIntent.getStringExtra("password").toString();
-        Log.d(TAG, "onCreate() called with: savedInstanceState = [" + savedInstanceState + "]" + pass);
     }
 
     @Override

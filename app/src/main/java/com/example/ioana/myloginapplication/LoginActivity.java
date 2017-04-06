@@ -10,6 +10,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.ioana.myloginapplication.model.GitHub;
+import com.example.ioana.myloginapplication.model.LoginData;
+
+import okhttp3.Credentials;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LoginActivity extends AppCompatActivity {
 
     @Override
@@ -17,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final EditText password = (EditText) findViewById(R.id.password);
+        final EditText userName = (EditText) findViewById(R.id.username);
 
         final SharedPreferences myPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -27,16 +36,42 @@ public class LoginActivity extends AppCompatActivity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(LoginActivity.this, "Magic button has been pressed", Toast.LENGTH_SHORT).show();
 
-                        if (password.getText().toString().equals("bla")) {
-                            myPreferences.edit().putBoolean("logged_in",true).apply();
-                            Intent loginIntent = new Intent(LoginActivity.this, ProfileActivity.class);
-                            loginIntent.putExtra("password", "bla");
-                            startActivity(loginIntent);
-                            finish();
+                    Call<LoginData> loginCall = GitHub.Service.Get().checkAuth(Credentials.basic(userName.getText().toString(),password.getText().toString()));
+
+                    loginCall.enqueue(new Callback<LoginData>() {
+                        @Override
+                        public void onResponse(Call<LoginData> call, Response<LoginData> response) {
+                            if (response.isSuccessful()) {
+                                myPreferences.edit().putBoolean("logged_in",true).apply();
+                                Intent loginIntent = new Intent(LoginActivity.this, ProfileActivity.class);
+                                startActivity(loginIntent);
+                                finish();
+                            }
+                            else {
+                                Toast.makeText(LoginActivity.this, "Auth error", Toast.LENGTH_SHORT).show();
+                            }
 
                         }
+
+                        @Override
+                        public void onFailure(Call<LoginData> call, Throwable t) {
+                            Toast.makeText(LoginActivity.this, "Dubios error", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    if (password.getText().toString().equals("bla")) {
+
+
+                        }/*
+                    if (password.getText().toString().equals("bla")) {
+                        myPreferences.edit().putBoolean("logged_in",true).apply();
+                        Intent loginIntent = new Intent(LoginActivity.this, RepositoriesActivity.class);
+                        loginIntent.putExtra("password", "bla");
+                        startActivity(loginIntent);
+                        finish();
+
+                    }*/
+
 
 
 
